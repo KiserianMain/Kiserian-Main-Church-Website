@@ -1,0 +1,47 @@
+services:
+  # Backend API Service
+  - type: web
+    name: sda-church-api
+    env: node
+    plan: free
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"
+    healthCheckPath: /api/health
+    autoDeploy: true
+    
+  # PostgreSQL Database (Render Add-on)
+  - type: pserv
+    name: sda-church-db
+    plan: free
+    databaseName: sda_church
+    user: sda_church_user
+
+# Environment Variables
+environment:
+  - key: NODE_ENV
+    value: production
+  - key: JWT_SECRET
+    generateValue: true
+  - key: FRONTEND_URL
+    value: https://sda-church-kiserian.onrender.com
+  - key: DATABASE_URL
+    fromDatabase:
+      name: sda-church-db
+      property: connectionString
+
+# Build and Deployment
+build:
+  dockerfilePath: ./Dockerfile
+  dockerContext: ./
+
+# Health Check
+healthCheck:
+  path: /api/health
+  timeout: 100
+
+# Scaling (upgrade as needed)
+scaling:
+  minInstances: 1
+  maxInstances: 3
+  targetMemoryPercent: 80
+  targetCPUPercent: 80
