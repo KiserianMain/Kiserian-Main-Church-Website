@@ -11,7 +11,7 @@ class ApiService {
   // Get current API URL based on environment
   static String get baseUrl {
     const bool isProduction = const bool.fromEnvironment('dart.vm.product');
-    return isProduction ? 'https://sda-church-api.onrender.com/api' : _baseUrl;
+    return isProduction ? 'https://your-render-backend-url.onrender.com/api' : _baseUrl;
   }
   
   final Dio _dio;

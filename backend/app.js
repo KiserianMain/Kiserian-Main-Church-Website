@@ -18,15 +18,15 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // CORS configuration
-const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:5180';
-app.use(
-  cors({
-    origin: FRONTEND_ORIGIN,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: [
+    'http://localhost:5180',
+    'https://kiserian-main-sda-church-website-c7u7oiydk.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  credentials: true,
+}));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
