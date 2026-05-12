@@ -17,14 +17,37 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS configuration
+// Enhanced CORS configuration for mobile apps and APIs
+const allowedOrigins = [
+  'http://localhost:5180',
+  'https://kiserian-main-sda-church-website-c7u7oiydk.vercel.app',
+  'http://localhost:3000', // Flutter development
+  'http://localhost:5173',  // Mobile development
+  'http://127.0.0.1:5173',  // Local testing
+  process.env.FRONTEND_ORIGIN,
+  'https://your-render-backend-url.onrender.com', // Production
+].filter(Boolean);
+
 app.use(cors({
-  origin: [
-    'http://localhost:5180',
-    'https://kiserian-main-sda-church-website-c7u7oiydk.vercel.app'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Allow any localhost development origin
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      return callback(null, true);
+    }
+    
+    // Allow explicitly configured origins
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Block unauthorized origins
+    return callback(new Error('Not allowed by CORS: ' + origin));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token', 'Origin', 'Accept', 'X-Requested-With'],
   credentials: true,
 }));
 
@@ -41,6 +64,7 @@ app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/users', require('./routes/users.routes'));
 app.use('/api/announcements', require('./routes/announcements.routes'));
 app.use('/api/departments', require('./routes/departments.routes'));
+app.use('/api/department', require('./routes/department.routes'));
 app.use('/api/payments', require('./routes/payments.routes'));
 app.use('/api/events', require('./routes/events.routes'));
 app.use('/api/sms', require('./routes/sms.routes'));
